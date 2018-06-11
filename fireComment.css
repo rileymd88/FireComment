@@ -1,0 +1,86 @@
+.fireIconPanel {
+    float: right;
+    z-index: 100;
+    position: relative;
+    right: 6%;
+}
+
+.fireContent {
+    width: calc(95% - 4px);
+    height: calc(95% - 4px);
+    left: calc(0% + 2px);
+    top: calc(8.33333% + 2px);
+    padding-top: 4%;
+    overflow: auto;
+    z-index: 99;
+}
+
+.fireTd {
+    text-align: right;
+    padding: 0.23076923em;
+    border-top: 1px solid #fff;
+	border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    white-space: nowrap;
+	overflow: auto;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+	cursor: default;
+    font-size: fontVariable;
+}
+
+.fireLi {
+    font-size: fontVariable;
+}
+
+.fireP {
+    font-size: fontVariable;
+}
+
+.fireTdLeft {
+    text-align: right;
+    padding: 0.23076923em;
+    border-top: 1px solid #fff;
+	border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    white-space: nowrap;
+	overflow: auto;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+	cursor: default;
+    font-size: fontVariable;
+}
+
+.fireThLeft {
+    text-align: center;
+    padding: 0.23076923em;
+    border-top: 1px solid #ddd;
+	border-bottom: 2px solid #ddd;
+    border-right: 1px solid #ddd;
+    white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+	cursor: default;
+    font-size: fontVariable;
+}
+
+.fireTh {
+    text-align: center;
+    padding: 0.23076923em;
+    border-top: 1px solid #ddd;
+	border-bottom: 2px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+	cursor: default;
+    font-size: fontVariable;
+}
+
+.fireContainter {
+    padding: 5%
+}
