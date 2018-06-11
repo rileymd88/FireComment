@@ -1,5 +1,5 @@
 ![Image of Logo](https://github.com/rileymd88/FireComment/blob/master/FireComment.png)
-# FireComment
+
 A simple Qlik Sense extension which enables commenting by using a Firebase Realtime Database as a back end
 ![Alt Text](https://github.com/rileymd88/FireComment/blob/master/FireComment.gif)
 
