@@ -1,8 +1,12 @@
 # FireComment
 A simple Qlik Sense extension which enables commenting by using a Firebase Realtime Database as a back end
 
-# Feature Overview
 ![Alt Text](https://github.com/rileymd88/FireComment/blob/master/FireComment.gif)
+
+# Feature Overview
+* Only need to import the extension (no need to run a new background service/db)
+* All comments are displayed in real time (no need to refresh the extension)
+* All comments are saved and displayed based on the selection within the app
 
 # Setup Instructions
 1. First you will need to get the appropriate firebase project details. Please follow the instructions in the link below to create a new firebase project and receive your config details: https://firebase.google.com/docs/web/setup The details you will need to copy look like this:
