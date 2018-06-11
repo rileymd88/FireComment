@@ -33,6 +33,6 @@ var config = {
   }
 }
  ```
-2. Download the FireComment extension here: https://github.com/rileymd88/FireComment/archive/master.zip
-3. Unzip the extension and update the config.js file with the details from step 1
-4. Zip the extension again and then upload it into the QMC
+3. Download the FireComment extension here: https://github.com/rileymd88/FireComment/archive/master.zip
+4. Unzip the extension and update the config.js file with the details from step 1
+5. Zip the extension again and then upload it into the QMC
