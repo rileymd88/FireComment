@@ -11,6 +11,7 @@ var oldFontSize;
 var oldCommentView;
 var initFirebase;
 var rendered;
+var editMode = 0;
 
 require.config({
 	paths: {
@@ -71,7 +72,7 @@ define([
 					global.getAuthenticatedUser(function (reply) {
 						currentUser = reply.qReturn;
 						currentUser = currentUser.replace('UserDirectory=', '');
-						currentUser = currentUser.replace('; UserId=', '/');
+						currentUser = currentUser.replace('; UserId=', '_');
 					});
 
 					// Init firebase
@@ -82,14 +83,48 @@ define([
 
 					// On click plus icon
 					$('#addButton').click(function () {
+						$('#editButton').hide();
 						$('#fireTextArea').val('');
 						$('#fireContainer').show();
 						$('#addButton').hide();
 						$('#fireContent').hide();
 					});
 
+
+					// On click edit icon
+					$('#editButton').click(function () {
+						editMode = 1;
+						$('#editButton').hide();
+						$('#addButton').hide();
+						$('#closeButton').show();
+						// add delete icon to comments made by current user
+						$("*[id*=" + currentUser + "]:visible").each(function () {
+							console.log('this', $(this));
+							$(this).find('.lui-icon.lui-icon--bin').show();
+							/* var id = $(this).attr('id');
+							$(this).append('<span class="lui-icon lui-icon--bin" value="delete_' + id + '" aria-hidden="true"></span>'); */
+						});
+						// On click delete icon callback
+						$(".lui-icon.lui-icon--bin").click(function () {
+							var ts = $(this)[0].parentElement.id;
+							var tsSplit = ts.split('_');
+							var id = tsSplit[2];
+							deleteComments('Comments/' + appId + '/' + currentSelections + '/' + id);
+						})
+					});
+
+					// On click close button
+					$('#closeButton').click(function () {
+						editMode = 0;
+						$('#editButton').show();
+						$('#addButton').show();
+						$('#closeButton').hide();
+						$(".lui-icon.lui-icon--bin").hide();
+					});
+
 					// On click cancel button
 					$('#cancelButton').click(function () {
+						$('#editButton').show();
 						$('#fireContainer').hide();
 						$('#addButton').show();
 						$('#fireContent').show();
@@ -103,6 +138,7 @@ define([
 						$('#fireContainer').hide();
 						$('#addButton').show();
 						$('#fireContent').show();
+						$('#editButton').show();
 					});
 
 					// Get current app and appid
@@ -171,22 +207,44 @@ define([
 
 								if (layout.commentView == 'dt') {
 									$('#fireTable').append(
-										'<tr><td class="fireTdLeft">' + node.val().user + '</td>' +
+										'<tr>' +
+										'<td class="fireTdLeft">' + node.val().user + '</td>' +
 										'<td class="fireTd">' + node.val().comment + '</td>' +
-										'<td class="fireTd">' + finalDate + '</td></tr>');
+										'<td class="fireTd"id=' + node.val().user + '_' + node.key + '>' + finalDate + '&nbsp&nbsp' + '</td>' +
+										'</tr>');
 								}
 								else if (layout.commentView == 'st') {
 									$('#fireTable').append(
-										'<tr><td class="fireTdLeft">' + node.val().comment + '</td></tr>');
+										'<tr>' +
+										'<td class="fireTdLeft" id=' + node.val().user + '_' + node.key + '>' + node.val().comment + '&nbsp&nbsp' + '</td>' +
+										'</tr>');
 								}
-								else if (layout.commentView == 'dtb') {
-									$('#fireP').append(node.val().user + '&nbsp;&nbsp;&nbsp;&nbsp;' + node.val().comment + '&nbsp;&nbsp;&nbsp;&nbsp;' + finalDate + '<br><br>');
-								}
+
 								else if (layout.commentView == 'stb') {
-									$('#fireUl').append('<li class="fireLi">' + node.val().comment + '</li><br>');
+									$('#fireUl').append('<li class="fireLi" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
+										node.val().comment + '</li><br>');
+								}
+								$('#' + node.val().user + '_' + node.key).append('<span class="lui-icon lui-icon--bin" aria-hidden="true" style="display: none;"></span>');
+
+
+								if (node.val().user == currentUser && editMode == 1) {
+									console.log('close visible');
+									$('#' + node.val().user + '_' + node.key).find('.lui-icon.lui-icon--bin').show();
+									// On click delete icon callback
+									$(".lui-icon.lui-icon--bin").click(function () {
+										var ts = $(this)[0].parentElement.id;
+										var tsSplit = ts.split('_');
+										var id = tsSplit[2];
+										deleteComments('Comments/' + appId + '/' + currentSelections + '/' + id);
+									})
 								}
 							})
 						});
+					}
+
+					// Delete comments
+					function deleteComments(ref) {
+						firebase.database().ref(ref).remove();
 					}
 
 					// Function to clear contents of table/textbox

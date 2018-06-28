@@ -13,10 +13,6 @@ define([], function () {
             label: "Simple Table"
         },
         {
-            value: "dtb",
-            label: "Detailed Textbox"
-        },
-        {
             value: "stb",
             label: "Simple Textbox"
         }],
