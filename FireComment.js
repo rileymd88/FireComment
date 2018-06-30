@@ -8,10 +8,13 @@ var config = {
 var currentUser;
 var oldCommentRef;
 var oldFontSize;
-var oldCommentView;
+var oldCommentView = null;
+var oldCommentLevel = null;
 var initFirebase;
 var rendered;
 var editMode = 0;
+var ref;
+var oldRef;
 
 require.config({
 	paths: {
@@ -32,8 +35,6 @@ define([
 ],
 	function (qlik, $, firebase, html, leoCss, fireCss, configFile, leoJs, prop) {
 
-
-
 		return {
 			definition: prop,
 			support: {
@@ -42,10 +43,20 @@ define([
 				exportData: false
 			},
 			paint: async function ($element, layout) {
-				console.log('paint');
+				// Update view if comment view or level is changed (this does not seem to be working)
+				/* if (oldCommentView !== layout.commentView || oldCommentLevel !== layout.commentLevel) {
+					if (oldCommentView !== null || oldCommentLevel !== null) {
+						getSelections();
+					}
+					else {
+						oldCommentView = layout.commentView;
+						oldCommentLevel = layout.commentLevel;
+					}
+				} */
 
 				if (!rendered) {
 					rendered = true;
+
 				}
 				else {
 					// Change CSS when font size is changed in prop
@@ -59,7 +70,6 @@ define([
 
 				var fireIconPanel = $('#fireIconPanel');
 				if (!fireIconPanel.length) {
-					console.log('does not exist');
 
 					// Add custom CSS
 					css = fireCss.replace(/fontVariable/g, layout.fontSize);
@@ -99,17 +109,14 @@ define([
 						$('#closeButton').show();
 						// add delete icon to comments made by current user
 						$("*[id*=" + currentUser + "]:visible").each(function () {
-							console.log('this', $(this));
 							$(this).find('.lui-icon.lui-icon--bin').show();
-							/* var id = $(this).attr('id');
-							$(this).append('<span class="lui-icon lui-icon--bin" value="delete_' + id + '" aria-hidden="true"></span>'); */
 						});
 						// On click delete icon callback
-						$(".lui-icon.lui-icon--bin").click(function () {
+						$(".lui-icon.lui-icon--bin").click(async function () {
 							var ts = $(this)[0].parentElement.id;
 							var tsSplit = ts.split('_');
 							var id = tsSplit[2];
-							deleteComments('Comments/' + appId + '/' + currentSelections + '/' + id);
+							deleteComments(id);
 						})
 					});
 
@@ -134,7 +141,7 @@ define([
 					$('#saveButton').click(async function () {
 						currentSelections = await getCurrentSelections();
 						milliseconds = await (new Date).getTime();
-						comments = await writeNewComment('Comments/' + appId + '/' + currentSelections + '/' + milliseconds, milliseconds, currentUser, $('#fireTextArea').val());
+						comments = await writeNewComment(milliseconds, currentUser, $('#fireTextArea').val());
 						$('#fireContainer').hide();
 						$('#addButton').show();
 						$('#fireContent').show();
@@ -147,18 +154,28 @@ define([
 
 					// Get notified about a new selection and retrieve new data and show it
 					async function getSelections() {
-						currentSelections = await getCurrentSelections();
-						await clearContent();
-						await createCommentView();
-						getComments(currentSelections);
+						currentSelections = '';
+						if (layout.commentLevel == 'aus' || layout.commentLevel == 'as') {
+							currentSelections = await getCurrentSelections();
+						}
+						if (layout.commentLevel == 'auds' || layout.commentLevel == 'ads') {
+							currentSelections = await createSelectionKey();
+						}
+						ref = await createDbRefs(null);
+						if (JSON.stringify(oldRef) !== JSON.stringify(ref)) {
+							oldRef = ref;
+							await clearContent();
+							await createCommentView();
+							getComments(currentSelections);
+						}
 					}
 
-					// Call getSelectionsAndData when new selection is made
+					// Call getSelections when new selection is made
 					app.getList("SelectionObject", function () {
 						getSelections();
 					});
 
-					// Function to get current selections. A generic object is created to acheive this
+					// Function to get current selections within the app. A generic object is created to acheive this
 					function getCurrentSelections() {
 						return new Promise(function (resolve, reject) {
 							app.createGenericObject({
@@ -172,8 +189,36 @@ define([
 						});
 					}
 
+					// Function to get the selections of particular dimensions (only used when the comment level is using a selected dimension)
+					function createSelectionKey() {
+						return new Promise(async function (resolve, reject) {
+							var dimensions = layout.qHyperCube.qDimensionInfo;
+							var selectionKey = '';
+							for (let dim of dimensions) {
+								var fieldSelection = await getFieldSelections(dim.qGroupFieldDefs[0]);
+								selectionKey += fieldSelection;
+							}
+							resolve(selectionKey);
+						})
+
+					}
+
+					// Creating generic object which returns field selection
+					function getFieldSelections(dim) {
+						return new Promise(function (resolve, reject) {
+							app.createGenericObject({
+								fieldSelection: {
+									qStringExpression: "=GetFieldSelections(" + dim + ", '',100)"
+								}
+							}, function (reply) {
+								fieldSelection = encodeURIComponent(reply.fieldSelection);
+								resolve(fieldSelection);
+							});
+						});
+					}
+
 					// Function to retrieve comments and show them in the table
-					function getComments(currentSelections) {
+					async function getComments(currentSelections) {
 
 						// remove old listener
 						if (oldCommentRef) {
@@ -181,70 +226,74 @@ define([
 						}
 
 						// Create new listener
-						var commentRef = firebase.database().ref('Comments/' + appId + '/' + currentSelections);
-						oldCommentRef = commentRef;
+						var commentRef = firebase.database().ref(ref.readRef);
 
-						// Get comments from new ref
-						commentRef.on('value', async function (snapshot) {
-							// First emply table
-							await clearContent();
-							await createCommentView();
+						// Only turn new listener on if it is not the same as the previous listener
+						if (oldCommentRef !== commentRef) {
+							oldCommentRef = commentRef;
 
-							// Get comments
-							comments = await snapshot.val();
+							// Get comments from new ref
+							commentRef.on('value', async function (snapshot) {
+								// First emply table
+								await clearContent();
+								await createCommentView();
 
-							// Loop through comments and append the table
-							snapshot.forEach(function (node) {
-								console.log('node', node);
-								var date = new Date(node.val().time);
-								var year = date.getFullYear();
-								var month = date.getMonth() + 1;
-								var day = date.getDate();
-								var hours = date.getHours();
-								var minutes = date.getMinutes();
-								var seconds = date.getSeconds();
-								var finalDate = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+								// Get comments
+								comments = await snapshot.val();
 
-								if (layout.commentView == 'dt') {
-									$('#fireTable').append(
-										'<tr>' +
-										'<td class="fireTdLeft">' + node.val().user + '</td>' +
-										'<td class="fireTd">' + node.val().comment + '</td>' +
-										'<td class="fireTd"id=' + node.val().user + '_' + node.key + '>' + finalDate + '&nbsp&nbsp' + '</td>' +
-										'</tr>');
-								}
-								else if (layout.commentView == 'st') {
-									$('#fireTable').append(
-										'<tr>' +
-										'<td class="fireTdLeft" id=' + node.val().user + '_' + node.key + '>' + node.val().comment + '&nbsp&nbsp' + '</td>' +
-										'</tr>');
-								}
+								// Loop through comments and append the table
+								snapshot.forEach(function (node) {
+									var date = new Date(node.val().time);
+									var year = date.getFullYear();
+									var month = date.getMonth() + 1;
+									var day = date.getDate();
+									var hours = date.getHours();
+									var minutes = date.getMinutes();
+									var seconds = date.getSeconds();
+									var finalDate = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
 
-								else if (layout.commentView == 'stb') {
-									$('#fireUl').append('<li class="fireLi" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
-										node.val().comment + '</li><br>');
-								}
-								$('#' + node.val().user + '_' + node.key).append('<span class="lui-icon lui-icon--bin" aria-hidden="true" style="display: none;"></span>');
+									if (layout.commentView == 'dt') {
+										$('#fireTable').append(
+											'<tr>' +
+											'<td class="fireTdLeft">' + node.val().user + '</td>' +
+											'<td class="fireTd">' + node.val().comment + '</td>' +
+											'<td class="fireTd"id=' + node.val().user + '_' + node.key + '>' + finalDate + '&nbsp&nbsp' + '</td>' +
+											'</tr>');
+									}
+									else if (layout.commentView == 'st') {
+										$('#fireTable').append(
+											'<tr>' +
+											'<td class="fireTdLeft" id=' + node.val().user + '_' + node.key + '>' + node.val().comment + '&nbsp&nbsp' + '</td>' +
+											'</tr>');
+									}
+
+									else if (layout.commentView == 'stb') {
+										$('#fireUl').append('<li class="fireLi" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
+											node.val().comment + '</li><br>');
+									}
+									$('#' + node.val().user + '_' + node.key).append('<span class="lui-icon lui-icon--bin" aria-hidden="true" style="display: none;"></span>');
 
 
-								if (node.val().user == currentUser && editMode == 1) {
-									console.log('close visible');
-									$('#' + node.val().user + '_' + node.key).find('.lui-icon.lui-icon--bin').show();
-									// On click delete icon callback
-									$(".lui-icon.lui-icon--bin").click(function () {
-										var ts = $(this)[0].parentElement.id;
-										var tsSplit = ts.split('_');
-										var id = tsSplit[2];
-										deleteComments('Comments/' + appId + '/' + currentSelections + '/' + id);
-									})
-								}
-							})
-						});
+									if (node.val().user == currentUser && editMode == 1) {
+										$('#' + node.val().user + '_' + node.key).find('.lui-icon.lui-icon--bin').show();
+										// On click delete icon callback
+										$(".lui-icon.lui-icon--bin").click(function () {
+											var ts = $(this)[0].parentElement.id;
+											var tsSplit = ts.split('_');
+											var id = tsSplit[2];
+											deleteComments(id);
+										})
+									}
+								})
+							});
+						}
+
 					}
 
 					// Delete comments
-					function deleteComments(ref) {
-						firebase.database().ref(ref).remove();
+					async function deleteComments(id) {
+						ref = await createDbRefs(id);
+						firebase.database().ref(ref.deleteRef).remove();
 					}
 
 					// Function to clear contents of table/textbox
@@ -252,6 +301,7 @@ define([
 						$('#fireContent').empty();
 					}
 
+					// Function to create table header
 					function createCommentView() {
 						if (layout.commentView == 'dt') {
 							$('#fireContent').append('<table id="fireTable" class="fire-table"><tr><th class="fireThLeft">User</th><th class="fireTh">Comments</th><th class="fireTh">Time</th></tr></table>');
@@ -269,8 +319,8 @@ define([
 					}
 
 					// Function to create a new comment
-					function writeNewComment(ref, time, user, comment) {
-						firebase.database().ref(ref).set({
+					async function writeNewComment(time, user, comment) {
+						firebase.database().ref(ref.createRef).set({
 							time: time,
 							user: user,
 							comment: comment
@@ -284,8 +334,46 @@ define([
 					}
 				}
 
+				// Function to create the correct database refs for Firebase based on comment level property in extension
+				async function createDbRefs(id) {
+					var ref = '';
+					// Create current time field
+					var time = await (new Date).getTime();
+
+					if (layout.commentLevel == 'aus' || layout.commentLevel == 'auds') {
+						ref = {
+							"createRef": 'CommentsAUS/' + appId + '/' + currentSelections + '/' + time,
+							"readRef": 'CommentsAUS/' + appId + '/' + currentSelections,
+							"deleteRef": 'CommentsAUS/' + appId + '/' + currentSelections + '/' + id
+						}
+					}
+					if (layout.commentLevel == 'as' || layout.commentLevel == 'ads') {
+						ref = {
+							"createRef": 'CommentsAS/' + appId + '/' + currentSelections + '/comment',
+							"readRef": 'CommentsAS/' + appId + '/' + currentSelections,
+							"deleteRef": 'CommentsAS/' + appId + '/' + currentSelections + '/comment'
+						}
+					}
+					if (layout.commentLevel == 'a') {
+						ref = {
+							"createRef": 'CommentsA/' + appId + '/comment',
+							"readRef": 'CommentsA/' + appId,
+							"deleteRef": 'CommentsA/' + appId + '/comment'
+						}
+					}
+					if (layout.commentLevel == 'au') {
+						ref = {
+							"createRef": 'CommentsAU/' + appId + time,
+							"readRef": 'CommentsAU/' + appId,
+							"deleteRef": 'CommentsAU/' + appId + id
+						}
+					}
+					return ref;
+				}
+
 				//needed for export
 				return qlik.Promise.resolve();
+
 			}
 		};
 

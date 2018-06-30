@@ -25,17 +25,30 @@ define([], function () {
         type: "string",
         component: "dropdown",
         options: [{
-            value: "aust",
-            label: "App + User + Selection + Time"
-        }, {
             value: "aus",
             label: "App + User + Selection"
-        },
-        {
+        }, {
             value: "as",
             label: "App + Selection"
-        }],
-        defaultValue: "aust"
+        },
+        {
+            value: "a",
+            label: "App"
+        },
+        {
+            value: "au",
+            label: "App + User"
+        },
+        {
+            value: "auds",
+            label: "App + User + Dimension Selection"
+        },
+        {
+            value: "ads",
+            label: "App + Dimension Selection"
+        }
+        ],
+        defaultValue: "aus"
     };
 
     var fontSize = {
@@ -51,20 +64,27 @@ define([], function () {
             fontSize: fontSize
         }
     };
-   /*  var dataSection = {
+    var dataSection = {
         component: "expandable-items",
         label: "Comment Data",
         items: {
             commentLevel: commentLevel
         }
-    }; */
+    };
+
+    var dimensions = {
+        uses: "dimensions",
+        min: 0,
+        max: 100
+    };
+
     return {
         type: "items",
         component: "accordion",
         items: {
-            appearance: appearanceSection
-            /* ,
-            data: dataSection */
+            dimensions: dimensions,
+            appearance: appearanceSection,
+            data: dataSection
         }
     };
 });

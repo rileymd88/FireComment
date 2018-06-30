@@ -1,12 +1,12 @@
 {
 	"name": "FireComment",
-	"description": "Basic empty visualization template",
+	"description": "A simple extension which enables commenting",
 	"type": "visualization",
 	"version": "1.0.0",
 	"icon": "extension",
-	"author": "",
+	"author": "Riley MacDonald",
 	"homepage": "",
-	"keywords": "qlik-sense, visualization",
+	"keywords": "qlik-sense, visualization, commenting, collaboration",
 	"license": "",
 	"repository": "",
 	"dependencies": {
