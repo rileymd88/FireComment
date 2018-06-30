@@ -249,8 +249,7 @@ define([
 									var day = date.getDate();
 									var hours = date.getHours();
 									var minutes = date.getMinutes();
-									var seconds = date.getSeconds();
-									var finalDate = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+									var finalDate = year + "-" + month + "-" + day + " " + hours + ":" + minutes;
 
 									if (layout.commentView == 'dt') {
 										$('#fireTable').append(
