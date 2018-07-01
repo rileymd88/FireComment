@@ -22,6 +22,7 @@ require.config({
 	}
 })
 
+
 define([
 	'qlik',
 	'jquery',
