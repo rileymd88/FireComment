@@ -11,6 +11,7 @@ A simple Qlik Sense extension which enables commenting by using a Firebase Realt
 * Only need to import the extension (no need to run a new background service/db)
 * All comments are displayed in real time (no need to refresh the extension)
 * All comments are saved and displayed in real time based on the selection within the app
+* Ability to change the level on which comments are saved on
 * Ability to delete comments
 * Ability to change font size and comment view types
 
