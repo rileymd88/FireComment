@@ -43,16 +43,6 @@ define([
 				exportData: false
 			},
 			paint: async function ($element, layout) {
-				// Update view if comment view or level is changed (this does not seem to be working)
-				/* if (oldCommentView !== layout.commentView || oldCommentLevel !== layout.commentLevel) {
-					if (oldCommentView !== null || oldCommentLevel !== null) {
-						getSelections();
-					}
-					else {
-						oldCommentView = layout.commentView;
-						oldCommentLevel = layout.commentLevel;
-					}
-				} */
 
 				if (!rendered) {
 					rendered = true;
