@@ -32,11 +32,12 @@ var config = {
 ```
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    ".read": "auth != null",
+    ".write": "auth != null"
   }
 }
  ```
-3. Download the FireComment extension here: https://github.com/rileymd88/FireComment/archive/master.zip
-4. Unzip the extension and update the config.js file with the details from step 1
-5. Zip the extension again and then upload it into the QMC
+3. Go to https://console.firebase.google.com/project/<YOUR_PROJECT_NAME>/authentication/providers and ensure that the Anonymous Sign-in provider is enabled
+4. Download the FireComment extension here: https://github.com/rileymd88/FireComment/archive/master.zip
+5. Unzip the extension and update the config.js file with the details from step 1
+6. Zip the extension again and then upload it into the QMC
