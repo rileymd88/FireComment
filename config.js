@@ -1,8 +1,9 @@
-  var config = {
-    apiKey: "<API_KEY>",
-    authDomain: "<PROJECT_ID>.firebaseapp.com",
-    databaseURL: "https://<DATABASE_NAME>.firebaseio.com",
-    projectId: "<PROJECT_ID>",
-    storageBucket: "<BUCKET>.appspot.com",
-    messagingSenderId: "<SENDER_ID>",
-  };
+var config = {
+	apiKey: "AIzaSyAP__4fxxsayRMVMbkpRXAbeA_iE_YdtkM",
+	authDomain: "firecomment.firebaseapp.com",
+	databaseURL: "https://firecomment.firebaseio.com",
+	projectId: "firecomment",
+	storageBucket: "firecomment.appspot.com",
+	messagingSenderId: "782747383056"
+};
+

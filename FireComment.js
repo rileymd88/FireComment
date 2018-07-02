@@ -35,7 +35,13 @@ define([
 	'./properties'
 ],
 	function (qlik, $, firebase, html, leoCss, fireCss, configFile, leoJs, prop) {
-
+		// Sign into Firebase
+		firebase.auth().signInAnonymously().catch(function (error) {
+			// Handle Errors here.
+			var errorCode = error.code;
+			var errorMessage = error.message;
+			// ...
+		});
 		return {
 			definition: prop,
 			support: {
