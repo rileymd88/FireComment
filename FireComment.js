@@ -46,25 +46,25 @@ define([
 			paint: async function ($element, layout) {
 				if (!rendered) {
 					rendered = true;
-
 				}
 				else {
 					// Change CSS when font size is changed in prop
 					if (layout.fontSize != oldFontSize) {
-						$('#fireCss').remove();
+						$('#fireCss_' + layout.qInfo.qId).remove();
 						css = fireCss.replace(/fontVariable/g, layout.fontSize);
-						$('<style id="fireCss">').html(css).appendTo("head");
+						$('<style id="fireCss_'+ layout.qInfo.qId + '">').html(css).appendTo("head");
 						oldFontSize = layout.fontSize;
 					}
 				}
 
-				var fireIconPanel = $('#fireIconPanel');
+				var fireIconPanel = $('#fireIconPanel_' + layout.qInfo.qId);
 				if (!fireIconPanel.length) {
-
 					// Add custom CSS
 					css = fireCss.replace(/fontVariable/g, layout.fontSize);
-					$('<style id="fireCss">').html(css).appendTo("head");
-					$element.append(html);
+					css = css.replace(/LAYOUTID/g, layout.qInfo.qId);
+					finalHtml = html.replace(/LAYOUTID/g, layout.qInfo.qId);
+					$('<style id="fireCss_' + layout.qInfo.qId + '">').html(css).appendTo("head");
+					$element.append(finalHtml);
 					oldFontSize = layout.fontSize;
 
 					// Get current user
@@ -88,21 +88,21 @@ define([
 					}
 
 					// On click plus icon
-					$('#addButton').click(function () {
-						$('#editButton').hide();
-						$('#fireTextArea').val('');
-						$('#fireContainer').show();
-						$('#addButton').hide();
-						$('#fireContent').hide();
+					$('#addButton_' + layout.qInfo.qId).click(function () {
+						$('#editButton_' + layout.qInfo.qId).hide();
+						$('#fireTextArea_' + layout.qInfo.qId).val('');
+						$('#fireContainer_' + layout.qInfo.qId).show();
+						$('#addButton_' + layout.qInfo.qId).hide();
+						$('#fireContent_' + layout.qInfo.qId).hide();
 					});
 
 
 					// On click edit icon
-					$('#editButton').click(function () {
+					$('#editButton_' + layout.qInfo.qId).click(function () {
 						editMode = 1;
-						$('#editButton').hide();
-						$('#addButton').hide();
-						$('#closeButton').show();
+						$('#editButton_' + layout.qInfo.qId).hide();
+						$('#addButton_' + layout.qInfo.qId).hide();
+						$('#closeButton_' + layout.qInfo.qId).show();
 						// add delete icon to comments made by current user
 						$("*[id*=" + currentUser + "]:visible").each(function () {
 							$(this).find('.lui-icon.lui-icon--bin').show();
@@ -117,32 +117,32 @@ define([
 					});
 
 					// On click close button
-					$('#closeButton').click(function () {
+					$('#closeButton_' + layout.qInfo.qId).click(function () {
 						editMode = 0;
-						$('#editButton').show();
-						$('#addButton').show();
-						$('#closeButton').hide();
+						$('#editButton_' + layout.qInfo.qId ).show();
+						$('#addButton_' + layout.qInfo.qId).show();
+						$('#closeButton_' + layout.qInfo.qId).hide();
 						$(".lui-icon.lui-icon--bin").hide();
 					});
 
 					// On click cancel button
-					$('#cancelButton').click(function () {
-						$('#editButton').show();
-						$('#fireContainer').hide();
-						$('#addButton').show();
-						$('#fireContent').show();
+					$('#cancelButton_' + layout.qInfo.qId).click(function () {
+						$('#editButton_' + layout.qInfo.qId).show();
+						$('#fireContainer_' + layout.qInfo.qId).hide();
+						$('#addButton_' + layout.qInfo.qId).show();
+						$('#fireContent_' + layout.qInfo.qId).show();
 					});
 
 					// On click save button write to DB
-					$('#saveButton').click(async function () {
+					$('#saveButton_' + layout.qInfo.qId).click(async function () {
+						console.log('click')
 						currentSelections = await getCurrentSelections();
 						milliseconds = await (new Date).getTime();
-						console.log(milliseconds);
-						comments = await writeNewComment(milliseconds, currentUser, $('#fireTextArea').val());
-						$('#fireContainer').hide();
-						$('#addButton').show();
-						$('#fireContent').show();
-						$('#editButton').show();
+						comments = await writeNewComment(milliseconds, currentUser, $('#fireTextArea_' + layout.qInfo.qId).val());
+						$('#fireContainer_' + layout.qInfo.qId).hide();
+						$('#addButton_' + layout.qInfo.qId).show();
+						$('#fireContent_' + layout.qInfo.qId).show();
+						$('#editButton_' + layout.qInfo.qId).show();
 					});
 
 					// Get current app and appid
@@ -209,7 +209,6 @@ define([
 								}
 							}, function (reply) {
 								fieldSelection = encodeURIComponent(reply.fieldSelection);
-								console.log(fieldSelection);
 								resolve(fieldSelection);
 							});
 						});
@@ -250,7 +249,7 @@ define([
 									var finalDate = year + "-" + month + "-" + day + " " + hours + ":" + minutes;
 
 									if (layout.commentView == 'dt') {
-										$("#fireTable" + layout.qInfo.qId).append(
+										$("#fireTable_" + layout.qInfo.qId).append(
 											'<tr>' +
 											'<td class="fireTdLeft">' + node.val().user + '</td>' +
 											'<td class="fireTd">' + node.val().comment + '</td>' +
@@ -258,7 +257,7 @@ define([
 											'</tr>');
 									}
 									else if (layout.commentView == 'st') {
-										$("#fireTable" + layout.qInfo.qId).append(
+										$("#fireTable_" + layout.qInfo.qId).append(
 											'<tr>' +
 											'<td class="fireTdLeft" id=' + node.val().user + '_' + node.key + '>' + node.val().comment + '&nbsp&nbsp' + '</td>' +
 											'</tr>');
@@ -295,23 +294,23 @@ define([
 
 					// Function to clear contents of table/textbox
 					function clearContent() {
-						$('#fireContent').empty();
+						$('#fireContent_' + layout.qInfo.qId).empty();
 					}
 
 					// Function to create table header
 					function createCommentView() {
 						if (layout.commentView == 'dt') {
-							$('#fireContent').append('<table id="fireTable' + layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">User</th><th class="fireTh">Comments</th><th class="fireTh">Time</th></tr></table>');
+							$('#fireContent_' + layout.qInfo.qId).append('<table id="fireTable_' + layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">User</th><th class="fireTh">Comments</th><th class="fireTh">Time</th></tr></table>');
 						}
 						else if (layout.commentView == 'st') {
-							$('#fireContent').append('<table id="fireTable' + layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">Comment</th></tr>');
+							$('#fireContent_' + layout.qInfo.qId).append('<table id="fireTable_' + layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">Comment</th></tr>');
 						}
 
 						else if (layout.commentView == 'dtb') {
-							$('#fireContent').append('<p id="fireP' + layout.qInfo.qId + '" class="fireP"></p>');
+							$('#fireContent_' + layout.qInfo.qId).append('<p id="fireP_' + layout.qInfo.qId + '" class="fireP"></p>');
 						}
 						else if (layout.commentView == 'stb') {
-							$('#fireContent').append('<p id="fireP' + layout.qInfo.qId + '" class="fireP"><ul id="fireUl' + layout.qInfo.qId + '"></ul></p>');
+							$('#fireContent_' + layout.qInfo.qId).append('<p id="fireP_' + layout.qInfo.qId + '" class="fireP"><ul id="fireUl_' + layout.qInfo.qId + '"></ul></p>');
 						}
 					}
 
