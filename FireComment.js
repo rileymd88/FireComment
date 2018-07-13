@@ -209,6 +209,7 @@ define([
 								}
 							}, function (reply) {
 								fieldSelection = encodeURIComponent(reply.fieldSelection);
+								console.log(fieldSelection);
 								resolve(fieldSelection);
 							});
 						});
@@ -300,23 +301,23 @@ define([
 					// Function to create table header
 					function createCommentView() {
 						if (layout.commentView == 'dt') {
-							$('#fireContent').append('<table id="fireTable'+ layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">User</th><th class="fireTh">Comments</th><th class="fireTh">Time</th></tr></table>');
+							$('#fireContent').append('<table id="fireTable' + layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">User</th><th class="fireTh">Comments</th><th class="fireTh">Time</th></tr></table>');
 						}
 						else if (layout.commentView == 'st') {
-							$('#fireContent').append('<table id="fireTable'+ layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">Comment</th></tr>');
+							$('#fireContent').append('<table id="fireTable' + layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">Comment</th></tr>');
 						}
 
 						else if (layout.commentView == 'dtb') {
-							$('#fireContent').append('<p id="fireP'+ layout.qInfo.qId + '" class="fireP"></p>');
+							$('#fireContent').append('<p id="fireP' + layout.qInfo.qId + '" class="fireP"></p>');
 						}
 						else if (layout.commentView == 'stb') {
-							$('#fireContent').append('<p id="fireP'+ layout.qInfo.qId + '" class="fireP"><ul id="fireUl'+ layout.qInfo.qId + '"></ul></p>');
+							$('#fireContent').append('<p id="fireP' + layout.qInfo.qId + '" class="fireP"><ul id="fireUl' + layout.qInfo.qId + '"></ul></p>');
 						}
 					}
 
 					// Function to create a new comment
 					async function writeNewComment(time, user, comment) {
-						ref = await createDbRefs();
+						ref = await createDbRefs(null);
 						firebase.database().ref(ref.createRef).set({
 							time: time,
 							user: user,
@@ -336,7 +337,7 @@ define([
 					var ref = '';
 					// Create current time field
 					var time = await (new Date).getTime();
-
+					currentSelections = await getCurrentSelections();
 					if (layout.commentLevel == 'aus' || layout.commentLevel == 'auds') {
 						ref = {
 							"createRef": 'CommentsAUS/' + appId + '/' + currentSelections + '/' + time,
@@ -352,6 +353,7 @@ define([
 						}
 					}
 					if (layout.commentLevel == 'a') {
+
 						ref = {
 							"createRef": 'CommentsA/' + appId + '/comment',
 							"readRef": 'CommentsA/' + appId,
@@ -360,11 +362,12 @@ define([
 					}
 					if (layout.commentLevel == 'au') {
 						ref = {
-							"createRef": 'CommentsAU/' + appId + time,
+							"createRef": 'CommentsAU/' + appId + '/' + time,
 							"readRef": 'CommentsAU/' + appId,
-							"deleteRef": 'CommentsAU/' + appId + id
+							"deleteRef": 'CommentsAU/' + appId + '/' + id
 						}
 					}
+					console.log(ref);
 					return ref;
 				}
 
