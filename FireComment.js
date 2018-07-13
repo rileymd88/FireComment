@@ -44,7 +44,6 @@ define([
 				exportData: false
 			},
 			paint: async function ($element, layout) {
-
 				if (!rendered) {
 					rendered = true;
 
@@ -82,10 +81,9 @@ define([
 						initFirebase = true;
 						// Sign into Firebase
 						firebase.auth().signInAnonymously().catch(function (error) {
-							// Handle Errors here.
 							var errorCode = error.code;
 							var errorMessage = error.message;
-							// ...
+							console.log(errorCode, errorMessage);
 						});
 					}
 
@@ -139,6 +137,7 @@ define([
 					$('#saveButton').click(async function () {
 						currentSelections = await getCurrentSelections();
 						milliseconds = await (new Date).getTime();
+						console.log(milliseconds);
 						comments = await writeNewComment(milliseconds, currentUser, $('#fireTextArea').val());
 						$('#fireContainer').hide();
 						$('#addButton').show();
@@ -250,7 +249,7 @@ define([
 									var finalDate = year + "-" + month + "-" + day + " " + hours + ":" + minutes;
 
 									if (layout.commentView == 'dt') {
-										$('#fireTable').append(
+										$("#fireTable" + layout.qInfo.qId).append(
 											'<tr>' +
 											'<td class="fireTdLeft">' + node.val().user + '</td>' +
 											'<td class="fireTd">' + node.val().comment + '</td>' +
@@ -258,14 +257,14 @@ define([
 											'</tr>');
 									}
 									else if (layout.commentView == 'st') {
-										$('#fireTable').append(
+										$("#fireTable" + layout.qInfo.qId).append(
 											'<tr>' +
 											'<td class="fireTdLeft" id=' + node.val().user + '_' + node.key + '>' + node.val().comment + '&nbsp&nbsp' + '</td>' +
 											'</tr>');
 									}
 
 									else if (layout.commentView == 'stb') {
-										$('#fireUl').append('<li class="fireLi" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
+										$("#fireUl" + layout.qInfo.qId).append('<li class="fireLi" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
 											node.val().comment + '</li><br>');
 									}
 									$('#' + node.val().user + '_' + node.key).append('<span class="lui-icon lui-icon--bin" aria-hidden="true" style="display: none;"></span>');
@@ -301,22 +300,23 @@ define([
 					// Function to create table header
 					function createCommentView() {
 						if (layout.commentView == 'dt') {
-							$('#fireContent').append('<table id="fireTable" class="fire-table"><tr><th class="fireThLeft">User</th><th class="fireTh">Comments</th><th class="fireTh">Time</th></tr></table>');
+							$('#fireContent').append('<table id="fireTable'+ layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">User</th><th class="fireTh">Comments</th><th class="fireTh">Time</th></tr></table>');
 						}
 						else if (layout.commentView == 'st') {
-							$('#fireContent').append('<table id="fireTable" class="fire-table"><tr><th class="fireThLeft">Comment</th></tr>');
+							$('#fireContent').append('<table id="fireTable'+ layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">Comment</th></tr>');
 						}
 
 						else if (layout.commentView == 'dtb') {
-							$('#fireContent').append('<p id="fireP" class="fireP"></p>');
+							$('#fireContent').append('<p id="fireP'+ layout.qInfo.qId + '" class="fireP"></p>');
 						}
 						else if (layout.commentView == 'stb') {
-							$('#fireContent').append('<p id="fireP" class="fireP"><ul id="fireUl"></ul></p>');
+							$('#fireContent').append('<p id="fireP'+ layout.qInfo.qId + '" class="fireP"><ul id="fireUl'+ layout.qInfo.qId + '"></ul></p>');
 						}
 					}
 
 					// Function to create a new comment
 					async function writeNewComment(time, user, comment) {
+						ref = await createDbRefs();
 						firebase.database().ref(ref.createRef).set({
 							time: time,
 							user: user,
