@@ -39,5 +39,5 @@ var config = {
  ```
 3. Go to https://console.firebase.google.com/project/<YOUR_PROJECT_NAME>/authentication/providers and ensure that the Anonymous Sign-in provider is enabled
 4. Download the FireComment extension here: https://github.com/rileymd88/FireComment/archive/master.zip
-5. Unzip the extension and update the config.js file with the details from step 1
+5. Unzip the extension and create a new javascript file named "config.js" and place this file within the unzopped folder. Add the details from Step 1 into this file and save it.
 6. Zip the extension again and then upload it into the QMC
