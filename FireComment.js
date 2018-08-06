@@ -181,6 +181,7 @@ define([
 								}
 							}, function (reply) {
 								currentSelections = encodeURIComponent(reply.currentSelections);
+								currentSelections = currentSelections.replace(/\./g,'%2E')
 								resolve(currentSelections);
 							});
 						});
@@ -195,6 +196,7 @@ define([
 								var fieldSelection = await getFieldSelections(dim.qGroupFieldDefs[0]);
 								selectionKey += fieldSelection;
 							}
+
 							resolve(selectionKey);
 						})
 

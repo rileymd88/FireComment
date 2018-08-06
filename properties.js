@@ -26,7 +26,7 @@ define([], function () {
         component: "dropdown",
         options: [{
             value: "aus",
-            label: "App + User + Selection"
+            label: "App + Time + Selection"
         }, {
             value: "as",
             label: "App + Selection"
@@ -37,11 +37,11 @@ define([], function () {
         },
         {
             value: "au",
-            label: "App + User"
+            label: "App + Time"
         },
         {
             value: "auds",
-            label: "App + User + Dimension Selection"
+            label: "App + Time + Dimension Selection"
         },
         {
             value: "ads",
