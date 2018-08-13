@@ -40,7 +40,7 @@ define([
 			definition: prop,
 			support: {
 				snapshot: false,
-				export: false,
+				export: true,
 				exportData: false
 			},
 			paint: async function ($element, layout) {
