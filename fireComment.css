@@ -84,3 +84,73 @@
 .fireContainter {
     padding: 5%
 }
+
+
+#traffic-light_LAYOUTID {
+    position: absolute;
+    display:block;
+    left: 50%;
+    top: 50%; 
+    margin-left: -1.5vw;
+    margin-top: -4vw;
+    background-color:#333;
+    width:3vw;
+    height:8vw;
+    border-radius:0.75vw;
+        -webkit-transform: rotateZ(90deg); /* Safari */
+       transform: rotateZ(90deg); /* Standard syntax */
+  }
+  
+  .red {
+    -webkit-appearance: none;
+    position: relative;
+    left: 50%;
+    width:2vw;
+    height:2vw;
+    margin-top: 0.5vw;
+    margin-left:-1vw;
+    background-color: red;
+    border-radius: 100%;
+    display: block;
+  }
+  
+  .yellow {
+    -webkit-appearance: none;
+    position: relative;
+    left: 50%;
+    width:2vw;
+    height:2vw;
+    margin-top: 0.5vw;
+    margin-left:-1vw;
+    background-color: yellow;
+    border-radius: 100%;
+    display: block;
+  }
+  
+  .green {
+    -webkit-appearance: none;
+    position: relative;
+    left: 50%;
+     width:2vw;
+    height:2vw;
+    margin-top: 0.5vw;
+    margin-left:-1vw;
+    background-color: green;
+    border-radius: 100%;
+    display: block;
+  }
+
+
+  
+  .none {
+    -webkit-appearance: none;
+    position: relative;
+    left: 50%;
+    width:2vw;
+    height:2vw;
+    margin-top: 0.5vw;
+    margin-left:-1vw;
+    background-color: gray;
+    border-radius: 100%;
+    display: block;
+  }

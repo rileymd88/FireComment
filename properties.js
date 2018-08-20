@@ -15,6 +15,10 @@ define([], function () {
         {
             value: "stb",
             label: "Simple Textbox"
+        },
+        {
+            value: "tfl",
+            label: "Traffic Light"
         }],
         defaultValue: "dt"
     };

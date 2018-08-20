@@ -5,14 +5,15 @@ var config = {
 	port: window.location.port,
 	isSecure: window.location.protocol === "https:"
 };
+
 var currentUser;
-var oldCommentRef;
 var oldFontSize;
 var oldCommentView = null;
 var oldCommentLevel = null;
 var initFirebase;
 var rendered;
 var editMode = 0;
+var oldCommentRef;
 var ref;
 var oldRef;
 
@@ -28,14 +29,14 @@ define([
 	'jquery',
 	'firebase',
 	'text!./fireComment.html',
+	'text!./trafficLight.html',
 	'text!./leonardo-ui.css',
 	'text!./fireComment.css',
 	'./config',
 	'./leonardo-ui',
 	'./properties'
 ],
-	function (qlik, $, firebase, html, leoCss, fireCss, configFile, leoJs, prop) {
-
+	function (qlik, $, firebase, html, trafficHtml, leoCss, fireCss, configFile, leoJs, prop) {
 		return {
 			definition: prop,
 			support: {
@@ -44,27 +45,39 @@ define([
 				exportData: false
 			},
 			paint: async function ($element, layout) {
+				
+				
 				if (!rendered) {
 					rendered = true;
 				}
 				else {
 					// Change CSS when font size is changed in prop
 					if (layout.fontSize != oldFontSize) {
-						$('#fireCss_' + layout.qInfo.qId).remove();
+						$(`#fireCss_${layout.qInfo.qId}`).remove();
 						css = fireCss.replace(/fontVariable/g, layout.fontSize);
-						$('<style id="fireCss_'+ layout.qInfo.qId + '">').html(css).appendTo("head");
+						$(`<style id="fireCss_${layout.qInfo.qId}">`).html(css).appendTo("head");
 						oldFontSize = layout.fontSize;
 					}
 				}
 
 				var fireIconPanel = $('#fireIconPanel_' + layout.qInfo.qId);
 				if (!fireIconPanel.length) {
+					window['oldCommentRef' + layout.qInfo.qId] = null;
+					window['commentRef' + layout.qInfo.qId] = null;
+					window['ref' + layout.qInfo.qId] = null;
+					window['oldRef' + layout.qInfo.qId] = null;
 					// Add custom CSS
 					css = fireCss.replace(/fontVariable/g, layout.fontSize);
 					css = css.replace(/LAYOUTID/g, layout.qInfo.qId);
-					finalHtml = html.replace(/LAYOUTID/g, layout.qInfo.qId);
-					$('<style id="fireCss_' + layout.qInfo.qId + '">').html(css).appendTo("head");
-					$element.append(finalHtml);
+					$(`<style id="fireCss_${layout.qInfo.qId}">`).html(css).appendTo("head");
+					if (layout.commentView == 'tfl') {
+						finalHtml = trafficHtml.replace(/LAYOUTID/g, layout.qInfo.qId);
+						$element.append(finalHtml);
+					}
+					else {
+						finalHtml = html.replace(/LAYOUTID/g, layout.qInfo.qId);
+						$element.append(finalHtml);
+					}
 					oldFontSize = layout.fontSize;
 
 					// Get current user
@@ -83,7 +96,6 @@ define([
 						firebase.auth().signInAnonymously().catch(function (error) {
 							var errorCode = error.code;
 							var errorMessage = error.message;
-							console.log(errorCode, errorMessage);
 						});
 					}
 
@@ -119,7 +131,7 @@ define([
 					// On click close button
 					$('#closeButton_' + layout.qInfo.qId).click(function () {
 						editMode = 0;
-						$('#editButton_' + layout.qInfo.qId ).show();
+						$('#editButton_' + layout.qInfo.qId).show();
 						$('#addButton_' + layout.qInfo.qId).show();
 						$('#closeButton_' + layout.qInfo.qId).hide();
 						$(".lui-icon.lui-icon--bin").hide();
@@ -135,7 +147,6 @@ define([
 
 					// On click save button write to DB
 					$('#saveButton_' + layout.qInfo.qId).click(async function () {
-						console.log('click')
 						currentSelections = await getCurrentSelections();
 						milliseconds = await (new Date).getTime();
 						comments = await writeNewComment(milliseconds, currentUser, $('#fireTextArea_' + layout.qInfo.qId).val());
@@ -144,6 +155,17 @@ define([
 						$('#fireContent_' + layout.qInfo.qId).show();
 						$('#editButton_' + layout.qInfo.qId).show();
 					});
+
+					// On click radio buttons
+					$(`#green_${layout.qInfo.qId}`).click(function () {
+						writeNewComment(null, currentUser, 1);
+					})
+					$(`#yellow_${layout.qInfo.qId}`).click(function () {
+						writeNewComment(null, currentUser, 2);
+					})
+					$(`#red_${layout.qInfo.qId}`).click(function () {
+						writeNewComment(null, currentUser, 3);
+					})
 
 					// Get current app and appid
 					var app = qlik.currApp(this);
@@ -158,9 +180,9 @@ define([
 						if (layout.commentLevel == 'auds' || layout.commentLevel == 'ads') {
 							currentSelections = await createSelectionKey();
 						}
-						ref = await createDbRefs(null);
-						if (JSON.stringify(oldRef) !== JSON.stringify(ref)) {
-							oldRef = ref;
+						window['ref' + layout.qInfo.qId] = await createDbRefs(null);
+						if (JSON.stringify(window['oldRef' + layout.qInfo.qId]) !== JSON.stringify(window['ref' + layout.qInfo.qId])) {
+							window['oldRef' + layout.qInfo.qId] = window['ref' + layout.qInfo.qId];
 							await clearContent();
 							await createCommentView();
 							getComments(currentSelections);
@@ -181,7 +203,7 @@ define([
 								}
 							}, function (reply) {
 								currentSelections = encodeURIComponent(reply.currentSelections);
-								currentSelections = currentSelections.replace(/\./g,'%2E')
+								currentSelections = currentSelections.replace(/\./g, '%2E')
 								resolve(currentSelections);
 							});
 						});
@@ -220,19 +242,19 @@ define([
 					async function getComments(currentSelections) {
 
 						// remove old listener
-						if (oldCommentRef) {
-							oldCommentRef.off();
+						if (window['oldCommentRef' + layout.qInfo.qId]) {
+							window['oldCommentRef' + layout.qInfo.qId].off();
 						}
 
 						// Create new listener
-						var commentRef = firebase.database().ref(ref.readRef);
+						window['commentRef' + layout.qInfo.qId] = firebase.database().ref(window['ref' + layout.qInfo.qId].readRef);
 
 						// Only turn new listener on if it is not the same as the previous listener
-						if (oldCommentRef !== commentRef) {
-							oldCommentRef = commentRef;
+						if (window['oldCommentRef' + layout.qInfo.qId] !== window['commentRef' + layout.qInfo.qId]) {
+							window['oldCommentRef' + layout.qInfo.qId] = window['commentRef' + layout.qInfo.qId];
 
 							// Get comments from new ref
-							commentRef.on('value', async function (snapshot) {
+							window['commentRef' + layout.qInfo.qId].on('value', async function (snapshot) {
 								// First emply table
 								await clearContent();
 								await createCommentView();
@@ -249,7 +271,6 @@ define([
 									var hours = date.getHours();
 									var minutes = date.getMinutes();
 									var finalDate = year + "-" + month + "-" + day + " " + hours + ":" + minutes;
-
 									if (layout.commentView == 'dt') {
 										$("#fireTable_" + layout.qInfo.qId).append(
 											'<tr>' +
@@ -269,7 +290,31 @@ define([
 										$("#fireUl" + layout.qInfo.qId).append('<li class="fireLi" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
 											node.val().comment + '</li><br>');
 									}
+									else if (layout.commentView == 'tfl') {
+										switch (node.val().comment) {
+											case 1:
+												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('green');
+												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('none');
+												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('none');
+												break;
+											case 2:
+												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('none');
+												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('yellow');
+												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('none');
+												break;
+											case 3:
+												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('none');
+												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('none');
+												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('red');
+												break;
+											default:
+												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('none');
+												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('none');
+												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('none');
+										}
+									}
 									$('#' + node.val().user + '_' + node.key).append('<span class="lui-icon lui-icon--bin" aria-hidden="true" style="display: none;"></span>');
+
 
 
 									if (node.val().user == currentUser && editMode == 1) {
@@ -325,7 +370,6 @@ define([
 							comment: comment
 						}, function (error) {
 							if (error) {
-								console.log(error);
 							}
 							else {
 							}
@@ -341,34 +385,33 @@ define([
 					currentSelections = await getCurrentSelections();
 					if (layout.commentLevel == 'aus' || layout.commentLevel == 'auds') {
 						ref = {
-							"createRef": 'CommentsAUS/' + appId + '/' + currentSelections + '/' + time,
-							"readRef": 'CommentsAUS/' + appId + '/' + currentSelections,
-							"deleteRef": 'CommentsAUS/' + appId + '/' + currentSelections + '/' + id
+							"createRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + time,
+							"readRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections,
+							"deleteRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + id
 						}
 					}
 					if (layout.commentLevel == 'as' || layout.commentLevel == 'ads') {
 						ref = {
-							"createRef": 'CommentsAS/' + appId + '/' + currentSelections + '/comment',
-							"readRef": 'CommentsAS/' + appId + '/' + currentSelections,
-							"deleteRef": 'CommentsAS/' + appId + '/' + currentSelections + '/comment'
+							"createRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/comment',
+							"readRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections,
+							"deleteRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/comment'
 						}
 					}
 					if (layout.commentLevel == 'a') {
 
 						ref = {
-							"createRef": 'CommentsA/' + appId + '/comment',
-							"readRef": 'CommentsA/' + appId,
-							"deleteRef": 'CommentsA/' + appId + '/comment'
+							"createRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId + '/' + '/comment',
+							"readRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId + '/',
+							"deleteRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId + '/' + '/comment'
 						}
 					}
 					if (layout.commentLevel == 'au') {
 						ref = {
-							"createRef": 'CommentsAU/' + appId + '/' + time,
-							"readRef": 'CommentsAU/' + appId,
-							"deleteRef": 'CommentsAU/' + appId + '/' + id
+							"createRef": 'CommentsAU/' + appId + '/' + layout.qInfo.qId + '/' + time,
+							"readRef": 'CommentsAU/' + appId + '/' + layout.qInfo.qId,
+							"deleteRef": 'CommentsAU/' + appId + '/' + layout.qInfo.qId + '/' + id
 						}
 					}
-					console.log(ref);
 					return ref;
 				}
 
@@ -377,6 +420,5 @@ define([
 
 			}
 		};
-
 	});
 
