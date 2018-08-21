@@ -44,6 +44,7 @@
     border-top: 1px solid #fff;
 	border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
     white-space: nowrap;
 	overflow: auto;
 	text-overflow: ellipsis;
@@ -58,6 +59,7 @@
     border-top: 1px solid #ddd;
 	border-bottom: 2px solid #ddd;
     border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
     white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -91,12 +93,12 @@
     display:block;
     left: 50%;
     top: 50%; 
-    margin-left: -1.5vw;
-    margin-top: -4vw;
+    margin-left: -0.75vw;
+    margin-top: -2vw;
     background-color:#333;
-    width:3vw;
-    height:8vw;
-    border-radius:0.75vw;
+    width:1.5vw;
+    height:4vw;
+    border-radius:0.375vw;
         -webkit-transform: rotateZ(90deg); /* Safari */
        transform: rotateZ(90deg); /* Standard syntax */
   }
@@ -105,10 +107,10 @@
     -webkit-appearance: none;
     position: relative;
     left: 50%;
-    width:2vw;
-    height:2vw;
-    margin-top: 0.5vw;
-    margin-left:-1vw;
+    width:1vw;
+    height:1vw;
+    margin-top: 0.25vw;
+    margin-left:-0.5vw;
     background-color: red;
     border-radius: 100%;
     display: block;
@@ -118,10 +120,10 @@
     -webkit-appearance: none;
     position: relative;
     left: 50%;
-    width:2vw;
-    height:2vw;
-    margin-top: 0.5vw;
-    margin-left:-1vw;
+    width:1vw;
+    height:1vw;
+    margin-top: 0.25vw;
+    margin-left:-0.5vw;
     background-color: yellow;
     border-radius: 100%;
     display: block;
@@ -131,10 +133,10 @@
     -webkit-appearance: none;
     position: relative;
     left: 50%;
-     width:2vw;
-    height:2vw;
-    margin-top: 0.5vw;
-    margin-left:-1vw;
+    width:1vw;
+    height:1vw;
+    margin-top: 0.25vw;
+    margin-left:-0.5vw;
     background-color: green;
     border-radius: 100%;
     display: block;
@@ -146,10 +148,10 @@
     -webkit-appearance: none;
     position: relative;
     left: 50%;
-    width:2vw;
-    height:2vw;
-    margin-top: 0.5vw;
-    margin-left:-1vw;
+    width:1vw;
+    height:1vw;
+    margin-top: 0.25vw;
+    margin-left:-0.5vw;
     background-color: gray;
     border-radius: 100%;
     display: block;

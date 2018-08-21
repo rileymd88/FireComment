@@ -158,13 +158,29 @@ define([
 
 					// On click radio buttons
 					$(`#green_${layout.qInfo.qId}`).click(function () {
-						writeNewComment(null, currentUser, 1);
+						if($(`#green_${layout.qInfo.qId}`).hasClass("green")) {
+							writeNewComment(null, currentUser, 0);
+						}
+						else {
+							writeNewComment(null, currentUser, 1);
+						}
+						
 					})
 					$(`#yellow_${layout.qInfo.qId}`).click(function () {
-						writeNewComment(null, currentUser, 2);
+						if($(`#yellow_${layout.qInfo.qId}`).hasClass("yellow")) {
+							writeNewComment(null, currentUser, 0);
+						}
+						else {
+							writeNewComment(null, currentUser, 2);
+						}
 					})
 					$(`#red_${layout.qInfo.qId}`).click(function () {
-						writeNewComment(null, currentUser, 3);
+						if($(`#red_${layout.qInfo.qId}`).hasClass("red")) {
+							writeNewComment(null, currentUser, 0);
+						}
+						else {
+							writeNewComment(null, currentUser, 3);
+						}
 					})
 
 					// Get current app and appid
@@ -287,7 +303,7 @@ define([
 									}
 
 									else if (layout.commentView == 'stb') {
-										$("#fireUl" + layout.qInfo.qId).append('<li class="fireLi" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
+										$("#fireUl_" + layout.qInfo.qId).append('<li class="fireLi" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
 											node.val().comment + '</li><br>');
 									}
 									else if (layout.commentView == 'tfl') {
@@ -352,10 +368,6 @@ define([
 						else if (layout.commentView == 'st') {
 							$('#fireContent_' + layout.qInfo.qId).append('<table id="fireTable_' + layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">Comment</th></tr>');
 						}
-
-						else if (layout.commentView == 'dtb') {
-							$('#fireContent_' + layout.qInfo.qId).append('<p id="fireP_' + layout.qInfo.qId + '" class="fireP"></p>');
-						}
 						else if (layout.commentView == 'stb') {
 							$('#fireContent_' + layout.qInfo.qId).append('<p id="fireP_' + layout.qInfo.qId + '" class="fireP"><ul id="fireUl_' + layout.qInfo.qId + '"></ul></p>');
 						}
@@ -383,25 +395,40 @@ define([
 					// Create current time field
 					var time = await (new Date).getTime();
 					currentSelections = await getCurrentSelections();
-					if (layout.commentLevel == 'aus' || layout.commentLevel == 'auds') {
+					currentDimensionSelections = await createSelectionKey();
+					if (layout.commentLevel == 'aus') {
 						ref = {
 							"createRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + time,
 							"readRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections,
 							"deleteRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + id
 						}
 					}
-					if (layout.commentLevel == 'as' || layout.commentLevel == 'ads') {
+					if(layout.commentLevel == 'auds') {
+						ref = {
+							"createRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/' + time,
+							"readRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections,
+							"deleteRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/' + id
+						}
+					}
+					if (layout.commentLevel == 'as') {
 						ref = {
 							"createRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/comment',
 							"readRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections,
 							"deleteRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/comment'
 						}
 					}
+					if(layout.commentLevel == 'ads') {
+						ref = {
+							"createRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/comment',
+							"readRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections,
+							"deleteRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/comment'
+						}
+					}
 					if (layout.commentLevel == 'a') {
 
 						ref = {
 							"createRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId + '/' + '/comment',
-							"readRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId + '/',
+							"readRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId,
 							"deleteRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId + '/' + '/comment'
 						}
 					}
@@ -412,6 +439,7 @@ define([
 							"deleteRef": 'CommentsAU/' + appId + '/' + layout.qInfo.qId + '/' + id
 						}
 					}
+					console.log(ref);
 					return ref;
 				}
 
