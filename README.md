@@ -15,6 +15,10 @@ A simple Qlik Sense extension which enables commenting by using a Firebase Realt
 * Ability to delete comments
 * Ability to change font size and comment view types
 
+# Version Overview
+* 1.0.2 - First version
+* 1.0.3 - Added bugfixes and new traffic light comment view type
+
 # Setup Instructions
 1. First you will need to get the appropriate firebase project details. Please follow the instructions in the link below to create a new firebase project and receive your config details: https://firebase.google.com/docs/web/setup The details you will need to copy look like this:
 
