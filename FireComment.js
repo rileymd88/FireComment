@@ -69,6 +69,9 @@ define([
 					// Add custom CSS
 					css = fireCss.replace(/fontVariable/g, layout.fontSize);
 					css = css.replace(/LAYOUTID/g, layout.qInfo.qId);
+					css = css.replace(/redColor/g, layout.redColor);
+					css = css.replace(/amberColor/g, layout.amberColor);
+					css = css.replace(/greenColor/g, layout.greenColor);
 					$(`<style id="fireCss_${layout.qInfo.qId}">`).html(css).appendTo("head");
 					if (layout.commentView == 'tfl') {
 						finalHtml = trafficHtml.replace(/LAYOUTID/g, layout.qInfo.qId);
@@ -439,7 +442,6 @@ define([
 							"deleteRef": 'CommentsAU/' + appId + '/' + layout.qInfo.qId + '/' + id
 						}
 					}
-					console.log(ref);
 					return ref;
 				}
 
