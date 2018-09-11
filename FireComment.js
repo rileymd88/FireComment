@@ -23,7 +23,6 @@ require.config({
 	}
 })
 
-
 define([
 	'qlik',
 	'jquery',
@@ -45,34 +44,44 @@ define([
 				exportData: false
 			},
 			paint: async function ($element, layout) {
-				
-				
-				if (!rendered) {
-					rendered = true;
-				}
-				else {
-					// Change CSS when font size is changed in prop
-					if (layout.fontSize != oldFontSize) {
-						$(`#fireCss_${layout.qInfo.qId}`).remove();
-						css = fireCss.replace(/fontVariable/g, layout.fontSize);
-						$(`<style id="fireCss_${layout.qInfo.qId}">`).html(css).appendTo("head");
-						oldFontSize = layout.fontSize;
-					}
-				}
-
-				var fireIconPanel = $('#fireIconPanel_' + layout.qInfo.qId);
-				if (!fireIconPanel.length) {
-					window['oldCommentRef' + layout.qInfo.qId] = null;
-					window['commentRef' + layout.qInfo.qId] = null;
-					window['ref' + layout.qInfo.qId] = null;
-					window['oldRef' + layout.qInfo.qId] = null;
-					// Add custom CSS
+				if (window['oldFontSize' + layout.qInfo.qId] != layout.fontSize ||
+					window['oldRedColor' + layout.qInfo.qId] != layout.redColor ||
+					window['oldAmberColor' + layout.qInfo.qId] != layout.amberColor ||
+					window['oldGreenColor' + layout.qInfo.qId] != layout.greenColor) {
+					$(`#fireCss_${layout.qInfo.qId}`).remove();
+					css = fireCss.replace(/fontVariable/g, layout.fontSize);
 					css = fireCss.replace(/fontVariable/g, layout.fontSize);
 					css = css.replace(/LAYOUTID/g, layout.qInfo.qId);
 					css = css.replace(/redColor/g, layout.redColor);
 					css = css.replace(/amberColor/g, layout.amberColor);
 					css = css.replace(/greenColor/g, layout.greenColor);
 					$(`<style id="fireCss_${layout.qInfo.qId}">`).html(css).appendTo("head");
+					window['oldFontSize' + layout.qInfo.qId] = layout.fontSize;
+					window['oldRedColor' + layout.qInfo.qId] = layout.oldRedColor;
+					window['oldAmberColor' + layout.qInfo.qId] = layout.oldAmberColor;
+					window['oldGreenColor' + layout.qInfo.qId] = layout.oldGreenColor;
+				}
+
+				if(window['oldCommentView' + layout.qInfo.qId] != layout.commentView) {
+					if(window['oldCommentRef' + layout.qInfo.qId]) {
+						window['oldCommentRef' + layout.qInfo.qId].off();
+					}
+					$element.empty();
+					window['oldCommentView' + layout.qInfo.qId] = layout.commentView;
+				}
+				if(layout.commentView =='tfl'){
+					var fireIconPanel =  $('#fireIconPanel2_' + layout.qInfo.qId);
+				}
+				else {
+					var fireIconPanel = $('#fireIconPanel_' + layout.qInfo.qId);
+				}
+
+				if (!fireIconPanel.length) {
+					
+					window['oldCommentRef' + layout.qInfo.qId] = null;
+					window['commentRef' + layout.qInfo.qId] = null;
+					window['ref' + layout.qInfo.qId] = null;
+					window['oldRef' + layout.qInfo.qId] = null;
 					if (layout.commentView == 'tfl') {
 						finalHtml = trafficHtml.replace(/LAYOUTID/g, layout.qInfo.qId);
 						$element.append(finalHtml);
@@ -81,7 +90,6 @@ define([
 						finalHtml = html.replace(/LAYOUTID/g, layout.qInfo.qId);
 						$element.append(finalHtml);
 					}
-					oldFontSize = layout.fontSize;
 
 					// Get current user
 					var global = qlik.getGlobal(config);
@@ -161,16 +169,16 @@ define([
 
 					// On click radio buttons
 					$(`#green_${layout.qInfo.qId}`).click(function () {
-						if($(`#green_${layout.qInfo.qId}`).hasClass("green")) {
+						if ($(`#green_${layout.qInfo.qId}`).hasClass("green_" + layout.qInfo.qId)) {
 							writeNewComment(null, currentUser, 0);
 						}
 						else {
 							writeNewComment(null, currentUser, 1);
 						}
-						
+
 					})
 					$(`#yellow_${layout.qInfo.qId}`).click(function () {
-						if($(`#yellow_${layout.qInfo.qId}`).hasClass("yellow")) {
+						if ($(`#yellow_${layout.qInfo.qId}`).hasClass("yellow_" + layout.qInfo.qId)) {
 							writeNewComment(null, currentUser, 0);
 						}
 						else {
@@ -178,7 +186,7 @@ define([
 						}
 					})
 					$(`#red_${layout.qInfo.qId}`).click(function () {
-						if($(`#red_${layout.qInfo.qId}`).hasClass("red")) {
+						if ($(`#red_${layout.qInfo.qId}`).hasClass("red_" + layout.qInfo.qId)) {
 							writeNewComment(null, currentUser, 0);
 						}
 						else {
@@ -283,6 +291,7 @@ define([
 
 								// Loop through comments and append the table
 								snapshot.forEach(function (node) {
+									console.log(node);
 									var date = new Date(node.val().time);
 									var year = date.getFullYear();
 									var month = date.getMonth() + 1;
@@ -293,43 +302,43 @@ define([
 									if (layout.commentView == 'dt') {
 										$("#fireTable_" + layout.qInfo.qId).append(
 											'<tr>' +
-											'<td class="fireTdLeft">' + node.val().user + '</td>' +
-											'<td class="fireTd">' + node.val().comment + '</td>' +
-											'<td class="fireTd"id=' + node.val().user + '_' + node.key + '>' + finalDate + '&nbsp&nbsp' + '</td>' +
+											'<td class="fireTdLeft_' + layout.qInfo.qId + '">' + node.val().user + '</td>' +
+											'<td class="fireTd_' + layout.qInfo.qId + '">' + node.val().comment + '</td>' +
+											'<td class="fireTd_' + layout.qInfo.qId + '"id=' + node.val().user + '_' + node.key + '>' + finalDate + '&nbsp&nbsp' + '</td>' +
 											'</tr>');
 									}
 									else if (layout.commentView == 'st') {
 										$("#fireTable_" + layout.qInfo.qId).append(
 											'<tr>' +
-											'<td class="fireTdLeft" id=' + node.val().user + '_' + node.key + '>' + node.val().comment + '&nbsp&nbsp' + '</td>' +
+											'<td class="fireTdLeft_' + layout.qInfo.qId + '" id=' + node.val().user + '_' + node.key + '>' + node.val().comment + '&nbsp&nbsp' + '</td>' +
 											'</tr>');
 									}
 
 									else if (layout.commentView == 'stb') {
-										$("#fireUl_" + layout.qInfo.qId).append('<li class="fireLi" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
+										$("#fireUl_" + layout.qInfo.qId).append('<li class="fireLi_' + layout.qInfo.qId + '" id=' + node.val().user + '_' + node.key + '>' + '&nbsp&nbsp' +
 											node.val().comment + '</li><br>');
 									}
 									else if (layout.commentView == 'tfl') {
 										switch (node.val().comment) {
 											case 1:
-												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('green');
-												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('none');
-												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('none');
+												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('green_' + layout.qInfo.qId);
+												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('none_' + layout.qInfo.qId);
+												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('none_' + layout.qInfo.qId);
 												break;
 											case 2:
-												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('none');
-												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('yellow');
-												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('none');
+												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('none_' + layout.qInfo.qId);
+												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('yellow_' + layout.qInfo.qId);
+												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('none_' + layout.qInfo.qId);
 												break;
 											case 3:
-												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('none');
-												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('none');
-												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('red');
+												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('none_' + layout.qInfo.qId);
+												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('none_' + layout.qInfo.qId);
+												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('red_' + layout.qInfo.qId);
 												break;
 											default:
-												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('none');
-												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('none');
-												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('none');
+												$(`#green_${layout.qInfo.qId}`).removeClass().addClass('none_' + layout.qInfo.qId);
+												$(`#yellow_${layout.qInfo.qId}`).removeClass().addClass('none_' + layout.qInfo.qId);
+												$(`#red_${layout.qInfo.qId}`).removeClass().addClass('none_' + layout.qInfo.qId);
 										}
 									}
 									$('#' + node.val().user + '_' + node.key).append('<span class="lui-icon lui-icon--bin" aria-hidden="true" style="display: none;"></span>');
@@ -360,19 +369,21 @@ define([
 
 					// Function to clear contents of table/textbox
 					function clearContent() {
-						$('#fireContent_' + layout.qInfo.qId).empty();
+						return new Promise(function(resolve, reject){
+							resolve($('#fireContent_' + layout.qInfo.qId).empty());
+						})
 					}
 
 					// Function to create table header
 					function createCommentView() {
 						if (layout.commentView == 'dt') {
-							$('#fireContent_' + layout.qInfo.qId).append('<table id="fireTable_' + layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">User</th><th class="fireTh">Comments</th><th class="fireTh">Time</th></tr></table>');
+							$('#fireContent_' + layout.qInfo.qId).append('<table id="fireTable_' + layout.qInfo.qId + '" class="fire-table_' + layout.qInfo.qId + '"><tr><th class="fireThLeft_' + layout.qInfo.qId + '">User</th><th class="fireTh_' + layout.qInfo.qId + '">Comments</th><th class="fireTh_' + layout.qInfo.qId + '">Time</th></tr></table>');
 						}
 						else if (layout.commentView == 'st') {
-							$('#fireContent_' + layout.qInfo.qId).append('<table id="fireTable_' + layout.qInfo.qId + '" class="fire-table"><tr><th class="fireThLeft">Comment</th></tr>');
+							$('#fireContent_' + layout.qInfo.qId).append('<table id="fireTable_' + layout.qInfo.qId + '" class="fire-table_' + layout.qInfo.qId + '"><tr><th class="fireThLeft_' + layout.qInfo.qId + '">Comment</th></tr>');
 						}
 						else if (layout.commentView == 'stb') {
-							$('#fireContent_' + layout.qInfo.qId).append('<p id="fireP_' + layout.qInfo.qId + '" class="fireP"><ul id="fireUl_' + layout.qInfo.qId + '"></ul></p>');
+							$('#fireContent_' + layout.qInfo.qId).append('<p id="fireP_' + layout.qInfo.qId + '" class="fireP_' + layout.qInfo.qId + '"><ul id="fireUl_' + layout.qInfo.qId + '"></ul></p>');
 						}
 					}
 
@@ -406,7 +417,7 @@ define([
 							"deleteRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + id
 						}
 					}
-					if(layout.commentLevel == 'auds') {
+					if (layout.commentLevel == 'auds') {
 						ref = {
 							"createRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/' + time,
 							"readRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections,
@@ -420,7 +431,7 @@ define([
 							"deleteRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/comment'
 						}
 					}
-					if(layout.commentLevel == 'ads') {
+					if (layout.commentLevel == 'ads') {
 						ref = {
 							"createRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/comment',
 							"readRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections,

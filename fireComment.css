@@ -1,11 +1,11 @@
-.fireIconPanel {
+.fireIconPanel_LAYOUTID {
     float: right;
     z-index: 100;
     position: relative;
     right: 6%;
 }
 
-.fireContent {
+.fireContent_LAYOUTID {
     width: calc(95% - 4px);
     height: calc(95% - 4px);
     left: calc(0% + 2px);
@@ -15,7 +15,7 @@
     z-index: 99;
 }
 
-.fireTd {
+.fireTd_LAYOUTID {
     text-align: right;
     padding: 0.23076923em;
     border-top: 1px solid #fff;
@@ -38,7 +38,7 @@
     font-size: fontVariable;
 }
 
-.fireTdLeft {
+.fireTdLeft_LAYOUTID {
     text-align: right;
     padding: 0.23076923em;
     border-top: 1px solid #fff;
@@ -53,7 +53,7 @@
     font-size: fontVariable;
 }
 
-.fireThLeft {
+.fireThLeft_LAYOUTID {
     text-align: center;
     padding: 0.23076923em;
     border-top: 1px solid #ddd;
@@ -68,7 +68,7 @@
     font-size: fontVariable;
 }
 
-.fireTh {
+.fireTh_LAYOUTID {
     text-align: center;
     padding: 0.23076923em;
     border-top: 1px solid #ddd;
@@ -83,7 +83,7 @@
     font-size: fontVariable;
 }
 
-.fireContainter {
+.fireContainter_LAYOUTID {
     padding: 5%
 }
 
@@ -103,7 +103,7 @@
        transform: rotateZ(90deg); /* Standard syntax */
   }
   
-  .red {
+  .red_LAYOUTID {
     -webkit-appearance: none;
     position: relative;
     left: 50%;
@@ -116,7 +116,7 @@
     display: block;
   }
   
-  .yellow {
+  .yellow_LAYOUTID {
     -webkit-appearance: none;
     position: relative;
     left: 50%;
@@ -129,7 +129,7 @@
     display: block;
   }
   
-  .green {
+  .green_LAYOUTID {
     -webkit-appearance: none;
     position: relative;
     left: 50%;
@@ -144,7 +144,7 @@
 
 
   
-  .none {
+  .none_LAYOUTID {
     -webkit-appearance: none;
     position: relative;
     left: 50%;
