@@ -231,7 +231,6 @@ define([
 							}, function (reply) {
 								currentSelections = encodeURIComponent(reply.currentSelections);
 								currentSelections = currentSelections.replace(/\./g, '%2E')
-								console.log(currentSelections);
 								resolve(currentSelections);
 							});
 						});
@@ -243,13 +242,13 @@ define([
 							var dimensions = layout.qHyperCube.qDimensionInfo;
 							var selectionKey = '';
 							for (let dim of dimensions) {
+								console.log(dim.qGroupFieldDefs[0]);
 								var fieldSelection = await getFieldSelections(dim.qGroupFieldDefs[0]);
 								selectionKey += fieldSelection;
 							}
 							console.log(selectionKey);
 							resolve(selectionKey);
 						})
-
 					}
 
 					// Creating generic object which returns field selection
@@ -257,8 +256,7 @@ define([
 						return new Promise(function (resolve, reject) {
 							app.createGenericObject({
 								fieldSelection: {
-									qStringExpression: `=GetFieldSelections([${dim}],'', '',100)`
-								}
+									qStringExpression: `=GetFieldSelections([${dim}],'',100)`								}
 							}, function (reply) {
 								fieldSelection = encodeURIComponent(reply.fieldSelection);
 								resolve(fieldSelection);
@@ -389,6 +387,7 @@ define([
 
 					// Function to create a new comment
 					async function writeNewComment(time, user, comment) {
+						console.log('write');
 						ref = await createDbRefs(null);
 						firebase.database().ref(ref.createRef).set({
 							time: time,
@@ -410,7 +409,9 @@ define([
 					var time = await (new Date).getTime();
 					currentSelections = await getCurrentSelections();
 					currentDimensionSelections = await createSelectionKey();
+				
 					if (layout.commentLevel == 'aus') {
+						
 						ref = {
 							"createRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + time,
 							"readRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections,
@@ -418,6 +419,7 @@ define([
 						}
 					}
 					if (layout.commentLevel == 'auds') {
+						console.log(currentSelections);
 						ref = {
 							"createRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/' + time,
 							"readRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections,
