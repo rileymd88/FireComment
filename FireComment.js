@@ -231,6 +231,7 @@ define([
 							}, function (reply) {
 								currentSelections = encodeURIComponent(reply.currentSelections);
 								currentSelections = currentSelections.replace(/\./g, '%2E')
+								console.log(currentSelections);
 								resolve(currentSelections);
 							});
 						});
@@ -245,7 +246,7 @@ define([
 								var fieldSelection = await getFieldSelections(dim.qGroupFieldDefs[0]);
 								selectionKey += fieldSelection;
 							}
-
+							console.log(selectionKey);
 							resolve(selectionKey);
 						})
 
@@ -256,7 +257,7 @@ define([
 						return new Promise(function (resolve, reject) {
 							app.createGenericObject({
 								fieldSelection: {
-									qStringExpression: "=GetFieldSelections(" + dim + ", '',100)"
+									qStringExpression: `=GetFieldSelections([${dim}],'', '',100)`
 								}
 							}, function (reply) {
 								fieldSelection = encodeURIComponent(reply.fieldSelection);
@@ -291,7 +292,6 @@ define([
 
 								// Loop through comments and append the table
 								snapshot.forEach(function (node) {
-									console.log(node);
 									var date = new Date(node.val().time);
 									var year = date.getFullYear();
 									var month = date.getMonth() + 1;
