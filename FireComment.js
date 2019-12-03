@@ -389,6 +389,7 @@ define([
 					async function writeNewComment(time, user, comment) {
 						console.log('write');
 						ref = await createDbRefs(null);
+
 						firebase.database().ref(ref.createRef).set({
 							time: time,
 							user: user,
@@ -413,46 +414,46 @@ define([
 					if (layout.commentLevel == 'aus') {
 						
 						ref = {
-							"createRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + time,
-							"readRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections,
-							"deleteRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + id
+							"createRef": 'CommentsAUS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + time,
+							"readRef": 'CommentsAUS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentSelections,
+							"deleteRef": 'CommentsAUS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentSelections + '/' + id
 						}
 					}
 					if (layout.commentLevel == 'auds') {
 						console.log(currentSelections);
 						ref = {
-							"createRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/' + time,
-							"readRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections,
-							"deleteRef": 'CommentsAUS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/' + id
+							"createRef": 'CommentsAUS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/' + time,
+							"readRef": 'CommentsAUS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentDimensionSelections,
+							"deleteRef": 'CommentsAUS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/' + id
 						}
 					}
 					if (layout.commentLevel == 'as') {
 						ref = {
-							"createRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/comment',
-							"readRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections,
-							"deleteRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentSelections + '/comment'
+							"createRef": 'CommentsAS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentSelections + '/comment',
+							"readRef": 'CommentsAS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentSelections,
+							"deleteRef": 'CommentsAS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentSelections + '/comment'
 						}
 					}
 					if (layout.commentLevel == 'ads') {
 						ref = {
-							"createRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/comment',
-							"readRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections,
-							"deleteRef": 'CommentsAS/' + appId + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/comment'
+							"createRef": 'CommentsAS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/comment',
+							"readRef": 'CommentsAS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentDimensionSelections,
+							"deleteRef": 'CommentsAS/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + currentDimensionSelections + '/comment'
 						}
 					}
 					if (layout.commentLevel == 'a') {
 
 						ref = {
-							"createRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId + '/' + '/comment',
-							"readRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId,
-							"deleteRef": 'CommentsA/' + appId + '/' + layout.qInfo.qId + '/' + '/comment'
+							"createRef": 'CommentsA/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + '/comment',
+							"readRef": 'CommentsA/' + appId.replace('.','_') + '/' + layout.qInfo.qId,
+							"deleteRef": 'CommentsA/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + '/comment'
 						}
 					}
 					if (layout.commentLevel == 'au') {
 						ref = {
-							"createRef": 'CommentsAU/' + appId + '/' + layout.qInfo.qId + '/' + time,
-							"readRef": 'CommentsAU/' + appId + '/' + layout.qInfo.qId,
-							"deleteRef": 'CommentsAU/' + appId + '/' + layout.qInfo.qId + '/' + id
+							"createRef": 'CommentsAU/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + time,
+							"readRef": 'CommentsAU/' + appId.replace('.','_') + '/' + layout.qInfo.qId,
+							"deleteRef": 'CommentsAU/' + appId.replace('.','_') + '/' + layout.qInfo.qId + '/' + id
 						}
 					}
 					return ref;
